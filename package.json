@@ -1,0 +1,7 @@
+{
+  "name": "phenomenal-art-gallery",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.6.0",
+  "type": "module"
+}
