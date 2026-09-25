@@ -36,7 +36,7 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
-    return this.categoryRepository.update(id, { ...data });
+    return this.categoryRepository.update(id, data);
   }
 
   async delete(id: string) {
