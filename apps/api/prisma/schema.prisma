@@ -33,14 +33,29 @@ model User {
   updatedAt    DateTime @updatedAt
 }
 
+model Media {
+  id        String          @id @default(uuid())
+  url       String
+  provider  StorageProvider
+  key       String          @unique
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  productImages  ProductImage[]
+  categoryImages Category[]
+}
+
 model Category {
   id          String   @id @default(uuid())
   name        String
   slug        String   @unique
   description String?
+  imageAlt    String?
+  mediaId     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  media    Media?    @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   products Product[]
 
   @@index([name])
@@ -66,19 +81,19 @@ model Product {
 }
 
 model ProductImage {
-  id        String          @id @default(uuid())
-  url       String
+  mediaId   String
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   altText   String
   productId String
-  sortOrder Int             @default(0)
-  provider  StorageProvider
-  key       String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@id([productId, mediaId])
   @@unique([productId, sortOrder])
+  @@index([mediaId])
 }
 
 model Tag {

@@ -29,6 +29,12 @@ export class CategoryController {
       properties: {
         name: { type: 'string', example: 'Electronics' },
         description: { type: 'string', example: 'Devices and gadgets' },
+        imageAlt: { type: 'string', example: 'Traditional Thangka painting' },
+        mediaId: {
+          type: 'string',
+          format: 'uuid',
+          example: '123e4567-e89b-12d3-a456-426614174000',
+        },
       },
       required: ['name'],
     },
@@ -99,6 +105,17 @@ export class CategoryController {
       properties: {
         name: { type: 'string', example: 'Updated Electronics' },
         description: { type: 'string', example: 'Updated description' },
+        imageAlt: {
+          type: 'string',
+          nullable: true,
+          example: 'Traditional Thangka painting',
+        },
+        mediaId: {
+          type: 'string',
+          format: 'uuid',
+          nullable: true,
+          example: '123e4567-e89b-12d3-a456-426614174000',
+        },
       },
     },
   })
