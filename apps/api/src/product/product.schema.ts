@@ -1,12 +1,10 @@
 import { z } from 'zod';
-import { ProductStatus, StorageProvider } from '../generated/prisma/enums.js';
+import { ProductStatus } from '../generated/prisma/enums.js';
 
 export const productImageSchema = z.object({
-  url: z.url(),
+  mediaId: z.uuid(),
   altText: z.string().trim().max(100),
   sortOrder: z.number().int().nonnegative().optional(),
-  key: z.string().trim().max(100),
-  provider: z.enum(StorageProvider),
 });
 
 export const createProductSchema = z.object({

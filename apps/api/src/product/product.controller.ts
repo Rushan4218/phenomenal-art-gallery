@@ -43,17 +43,15 @@ export class ProductController {
           items: {
             type: 'object',
             properties: {
-              url: { type: 'string', example: 'https://cdn.example/1.jpg' },
+              mediaId: {
+                type: 'string',
+                format: 'uuid',
+                example: '123e4567-e89b-12d3-a456-426614174000',
+              },
               altText: { type: 'string', example: 'Medicine Buddha' },
               sortOrder: { type: 'integer', example: 0 },
-              key: { type: 'string', example: 'products/1.jpg' },
-              provider: {
-                type: 'string',
-                enum: ['CLOUDINARY', 'S3'],
-                example: 'CLOUDINARY',
-              },
             },
-            required: ['url', 'altText', 'key', 'provider'],
+            required: ['mediaId', 'altText'],
           },
         },
       },
@@ -143,17 +141,15 @@ export class ProductController {
           items: {
             type: 'object',
             properties: {
-              url: { type: 'string', example: 'https://cdn.example/1.jpg' },
+              mediaId: {
+                type: 'string',
+                format: 'uuid',
+                example: '123e4567-e89b-12d3-a456-426614174000',
+              },
               altText: { type: 'string', example: 'Updated Thangka' },
               sortOrder: { type: 'integer', example: 0 },
-              key: { type: 'string', example: 'products/1.jpg' },
-              provider: {
-                type: 'string',
-                enum: ['CLOUDINARY', 'S3'],
-                example: 'CLOUDINARY',
-              },
             },
-            required: ['url', 'altText', 'key', 'provider'],
+            required: ['mediaId', 'altText'],
           },
         },
       },

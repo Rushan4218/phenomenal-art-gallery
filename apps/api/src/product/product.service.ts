@@ -24,7 +24,15 @@ export class ProductService {
       price: data.price,
       category: { connect: { id: data.categoryId } },
       images: data.images
-        ? { create: this.withDefaultSortOrder(data.images) }
+        ? {
+            createMany: {
+              data: this.withDefaultSortOrder(data.images).map((image) => ({
+                mediaId: image.mediaId,
+                altText: image.altText,
+                sortOrder: image.sortOrder,
+              })),
+            },
+          }
         : undefined,
     });
   }
@@ -66,7 +74,9 @@ export class ProductService {
         ...fields,
         ...(categoryId ? { category: { connect: { id: categoryId } } } : {}),
       },
-      images ? this.withDefaultSortOrder(images) : undefined,
+      images && images.length > 0
+        ? this.withDefaultSortOrder(images)
+        : undefined,
     );
   }
 

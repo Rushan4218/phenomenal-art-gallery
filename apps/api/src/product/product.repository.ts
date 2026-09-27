@@ -14,7 +14,7 @@ export class ProductRepository {
     return this.prisma.product.create({
       data,
       include: {
-        images: true,
+        images: { include: { media: true } },
         category: true,
         productTags: { include: { tag: true } },
       },
@@ -25,7 +25,7 @@ export class ProductRepository {
     return this.prisma.product.findMany({
       orderBy: { name: 'asc' },
       include: {
-        images: true,
+        images: { include: { media: true } },
         category: true,
         productTags: { include: { tag: true } },
       },
@@ -36,7 +36,7 @@ export class ProductRepository {
     return this.prisma.product.findUnique({
       where: { id },
       include: {
-        images: true,
+        images: { include: { media: true } },
         category: true,
         productTags: { include: { tag: true } },
       },
@@ -47,7 +47,9 @@ export class ProductRepository {
     return this.prisma.product.findUnique({
       where: { slug },
       include: {
-        images: true,
+        images: {
+          include: { media: true },
+        },
         category: true,
         productTags: { include: { tag: true } },
       },
@@ -70,7 +72,7 @@ export class ProductRepository {
       return tx.product.findUnique({
         where: { id },
         include: {
-          images: true,
+          images: { include: { media: true } },
           category: true,
           productTags: { include: { tag: true } },
         },

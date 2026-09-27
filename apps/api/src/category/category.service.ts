@@ -8,7 +8,12 @@ export class CategoryService {
 
   async create(data: CreateCategoryType) {
     const slug = data.name.trim().toLowerCase().replace(/\s+/g, '-');
-    return this.categoryRepository.create({ ...data, slug });
+    const { mediaId, ...fields } = data;
+    return this.categoryRepository.create({
+      ...fields,
+      slug,
+      ...(mediaId ? { media: { connect: { id: mediaId } } } : {}),
+    });
   }
 
   async findMany() {
@@ -36,7 +41,20 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
-    return this.categoryRepository.update(id, data);
+
+    const { mediaId, ...fields } = data;
+    let media: { connect: { id: string } } | { disconnect: true } | undefined;
+    if (mediaId === null) {
+      media = category.mediaId ? { disconnect: true } : undefined;
+    } else if (mediaId !== undefined) {
+      media = { connect: { id: mediaId } };
+    }
+
+    return this.categoryRepository.update(id, {
+      ...fields,
+      ...(media ? { media } : {}),
+      ...(mediaId === null ? { imageAlt: null } : {}),
+    });
   }
 
   async delete(id: string) {
