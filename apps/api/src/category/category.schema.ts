@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { paginationQuerySchema } from '../common/schemas/pagination.schema.js';
 
 const categorySchema = z.object({
   name: z.string().trim().min(1).max(50),
@@ -26,5 +27,8 @@ export const updateCategorySchema = categorySchema
   .partial()
   .refine(hasImageAltWithMedia, imageAltRule);
 
+export const listCategoriesSchema = paginationQuerySchema;
+
 export type CreateCategoryType = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryType = z.infer<typeof updateCategorySchema>;
+export type ListCategoriesType = z.infer<typeof listCategoriesSchema>;

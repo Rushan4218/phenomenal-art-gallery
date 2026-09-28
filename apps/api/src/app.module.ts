@@ -5,9 +5,16 @@ import { DatabaseModule } from './database/database.module.js';
 import { CategoryModule } from './category/category.module.js';
 import { ProductModule } from './product/product.module.js';
 import { MediaModule } from './media/media.module.js';
+import { InquiryModule } from './inquiry/inquiry.module.js';
 
 @Module({
-  imports: [DatabaseModule, MediaModule, CategoryModule, ProductModule],
+  imports: [
+    DatabaseModule,
+    MediaModule,
+    CategoryModule,
+    ProductModule,
+    InquiryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -4,18 +4,28 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import {
   createProductSchema,
+  listProductsSchema,
   updateProductSchema,
   type CreateProductType,
+  type ListProductsType,
   type UpdateProductType,
 } from './product.schema.js';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Products')
 @Controller('products')
@@ -71,12 +81,44 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Get all products' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Page number, defaults to 1',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 20,
+    description: 'Items per page, defaults to 20, maximum 100',
+  })
+  @ApiQuery({
+    name: 'categoryId',
+    required: false,
+    format: 'uuid',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'Filter products by category',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['DRAFT', 'ACTIVE', 'ARCHIVED'],
+    example: 'ACTIVE',
+    description: 'Filter products by status',
+  })
   @Get()
-  async findMany() {
-    const products = await this.productService.findMany();
+  async findMany(
+    @Query(new ZodValidationPipe(listProductsSchema))
+    query: ListProductsType,
+  ) {
+    const { data, meta } = await this.productService.findMany(query);
     return {
       message: 'Products retrieved successfully',
-      products,
+      data,
+      meta,
     };
   }
 
@@ -104,7 +146,7 @@ export class ProductController {
     required: true,
   })
   @Get(':id')
-  async findById(@Param('id') id: string) {
+  async findById(@Param('id', ParseUUIDPipe) id: string) {
     const product = await this.productService.findById(id);
     return {
       message: 'Product retrieved successfully',
@@ -157,7 +199,7 @@ export class ProductController {
   })
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(updateProductSchema))
     data: UpdateProductType,
   ) {
@@ -176,7 +218,7 @@ export class ProductController {
     required: true,
   })
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.productService.delete(id);
     return {
       message: 'Product deleted successfully',

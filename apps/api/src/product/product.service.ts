@@ -3,6 +3,7 @@ import { ProductRepository } from './product.repository.js';
 import { CategoryService } from '../category/category.service.js';
 import {
   CreateProductType,
+  ListProductsType,
   ProductImageType,
   UpdateProductType,
 } from './product.schema.js';
@@ -37,8 +38,18 @@ export class ProductService {
     });
   }
 
-  async findMany() {
-    return this.productRepository.findMany();
+  async findMany(query: ListProductsType) {
+    const { data, total } = await this.productRepository.findMany(query);
+
+    return {
+      data,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
+    };
   }
 
   async findById(id: string) {

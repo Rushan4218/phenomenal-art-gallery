@@ -4,18 +4,28 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import {
   createCategorySchema,
+  listCategoriesSchema,
   updateCategorySchema,
   type UpdateCategoryType,
   type CreateCategoryType,
+  type ListCategoriesType,
 } from './category.schema.js';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -51,12 +61,30 @@ export class CategoryController {
   }
 
   @ApiOperation({ summary: 'Get all categories' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Page number, defaults to 1',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 20,
+    description: 'Items per page, defaults to 20, maximum 100',
+  })
   @Get()
-  async findMany() {
-    const categories = await this.categoryService.findMany();
+  async findMany(
+    @Query(new ZodValidationPipe(listCategoriesSchema))
+    query: ListCategoriesType,
+  ) {
+    const { data, meta } = await this.categoryService.findMany(query);
     return {
       message: 'Categories retrieved successfully',
-      categories,
+      data,
+      meta,
     };
   }
 
@@ -68,7 +96,7 @@ export class CategoryController {
     required: true,
   })
   @Get(':id')
-  async findById(@Param('id') id: string) {
+  async findById(@Param('id', ParseUUIDPipe) id: string) {
     const category = await this.categoryService.findById(id);
     return {
       message: 'Category retrieved successfully',
@@ -121,7 +149,7 @@ export class CategoryController {
   })
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(updateCategorySchema))
     data: UpdateCategoryType,
   ) {
@@ -140,7 +168,7 @@ export class CategoryController {
     required: true,
   })
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.categoryService.delete(id);
     return {
       message: 'Category deleted successfully',
