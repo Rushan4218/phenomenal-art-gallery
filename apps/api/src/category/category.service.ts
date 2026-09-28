@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CategoryRepository } from './category.repository.js';
-import { CreateCategoryType, UpdateCategoryType } from './category.schema.js';
+import {
+  CreateCategoryType,
+  UpdateCategoryType,
+  ListCategoriesType,
+} from './category.schema.js';
 
 @Injectable()
 export class CategoryService {
@@ -16,8 +20,18 @@ export class CategoryService {
     });
   }
 
-  async findMany() {
-    return this.categoryRepository.findMany();
+  async findMany(query: ListCategoriesType) {
+    const { data, total } = await this.categoryRepository.findMany(query);
+
+    return {
+      data,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
+    };
   }
 
   async findById(id: string) {

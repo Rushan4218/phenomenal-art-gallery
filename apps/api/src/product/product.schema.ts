@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ProductStatus } from '../generated/prisma/enums.js';
+import { paginationQuerySchema } from '../common/schemas/pagination.schema.js';
 
 export const productImageSchema = z.object({
   mediaId: z.uuid(),
@@ -27,6 +28,12 @@ export const updateProductSchema = createProductSchema.partial().extend({
   status: z.enum(ProductStatus).optional(),
 });
 
+export const listProductsSchema = paginationQuerySchema.extend({
+  categoryId: z.uuid().optional(),
+  status: z.enum(ProductStatus).optional(),
+});
+
 export type CreateProductType = z.infer<typeof createProductSchema>;
 export type UpdateProductType = z.infer<typeof updateProductSchema>;
 export type ProductImageType = z.infer<typeof productImageSchema>;
+export type ListProductsType = z.infer<typeof listProductsSchema>;

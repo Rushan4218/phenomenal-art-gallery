@@ -23,6 +23,12 @@ enum StorageProvider {
   S3
 }
 
+enum InquiryStatus {
+  PENDING
+  RESPONDED
+  CLOSED
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -117,4 +123,21 @@ model ProductTag {
 
   @@id([productId, tagId])
   @@index([tagId])
+}
+
+model Inquiry {
+  id          String        @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  response    String?
+  respondedAt DateTime?
+  status      InquiryStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
 }

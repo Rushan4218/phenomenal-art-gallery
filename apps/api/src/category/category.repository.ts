@@ -4,6 +4,7 @@ import {
   CategoryCreateInput,
   CategoryUpdateInput,
 } from '../generated/prisma/models.js';
+import { ListCategoriesType } from './category.schema.js';
 
 @Injectable()
 export class CategoryRepository {
@@ -16,11 +17,20 @@ export class CategoryRepository {
     });
   }
 
-  async findMany() {
-    return this.prisma.category.findMany({
-      orderBy: { name: 'asc' },
-      include: { media: true },
-    });
+  async findMany(query: ListCategoriesType) {
+    const { page, limit } = query;
+
+    const [data, total] = await Promise.all([
+      this.prisma.category.findMany({
+        orderBy: { name: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { media: true },
+      }),
+      this.prisma.category.count(),
+    ]);
+
+    return { data, total };
   }
 
   async findById(id: string) {

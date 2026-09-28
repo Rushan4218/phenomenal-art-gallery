@@ -3,8 +3,9 @@ import { PrismaService } from '../database/prisma.service.js';
 import {
   ProductCreateInput,
   ProductUpdateInput,
+  ProductWhereInput,
 } from '../generated/prisma/models.js';
-import { ProductImageType } from './product.schema.js';
+import { ListProductsType, ProductImageType } from './product.schema.js';
 
 @Injectable()
 export class ProductRepository {
@@ -21,15 +22,29 @@ export class ProductRepository {
     });
   }
 
-  async findMany() {
-    return this.prisma.product.findMany({
-      orderBy: { name: 'asc' },
-      include: {
-        images: { include: { media: true } },
-        category: true,
-        productTags: { include: { tag: true } },
-      },
-    });
+  async findMany(query: ListProductsType) {
+    const { page, limit, categoryId, status } = query;
+    const where: ProductWhereInput = {
+      ...(categoryId ? { categoryId } : {}),
+      ...(status ? { status } : {}),
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { name: 'asc' },
+        include: {
+          images: { include: { media: true } },
+          category: true,
+          productTags: { include: { tag: true } },
+        },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return { data, total };
   }
 
   async findById(id: string) {
