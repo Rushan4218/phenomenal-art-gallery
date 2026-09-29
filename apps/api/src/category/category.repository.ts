@@ -61,6 +61,15 @@ export class CategoryRepository {
     });
   }
 
+  async existsBySlug(slug: string) {
+    const category = await this.prisma.category.findFirst({
+      where: { slug },
+      select: { id: true },
+    });
+
+    return category !== null;
+  }
+
   async update(id: string, data: CategoryUpdateInput) {
     return this.prisma.category.update({
       where: { id },
