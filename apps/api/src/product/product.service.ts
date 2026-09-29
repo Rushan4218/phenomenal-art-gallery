@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductRepository } from './product.repository.js';
 import { CategoryService } from '../category/category.service.js';
+import { uniqueSlug } from '../common/utils/slug.js';
 import {
   CreateProductType,
   ListProductsType,
@@ -30,7 +31,9 @@ export class ProductService {
 
   async create(data: CreateProductType) {
     await this.categoryService.findById(data.categoryId);
-    const slug = data.name.trim().toLowerCase().replace(/\s+/g, '-');
+    const slug = await uniqueSlug(data.name, (candidate) =>
+      this.productRepository.existsBySlug(candidate),
+    );
     return this.productRepository.create({
       name: data.name,
       slug,

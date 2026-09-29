@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CategoryRepository } from './category.repository.js';
+import { uniqueSlug } from '../common/utils/slug.js';
 import {
   CreateCategoryType,
   StorefrontCategoryItem,
@@ -21,7 +22,9 @@ export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
   async create(data: CreateCategoryType) {
-    const slug = data.name.trim().toLowerCase().replace(/\s+/g, '-');
+    const slug = await uniqueSlug(data.name, (candidate) =>
+      this.categoryRepository.existsBySlug(candidate),
+    );
     const { mediaId, ...fields } = data;
     return this.categoryRepository.create({
       ...fields,

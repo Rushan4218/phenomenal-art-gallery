@@ -127,6 +127,15 @@ export class ProductRepository {
     });
   }
 
+  async existsBySlug(slug: string) {
+    const product = await this.prisma.product.findFirst({
+      where: { slug },
+      select: { id: true },
+    });
+
+    return product !== null;
+  }
+
   async update(
     id: string,
     data: ProductUpdateInput,
