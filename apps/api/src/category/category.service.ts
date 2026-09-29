@@ -2,9 +2,19 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CategoryRepository } from './category.repository.js';
 import {
   CreateCategoryType,
+  StorefrontCategoryItem,
   UpdateCategoryType,
   ListCategoriesType,
 } from './category.schema.js';
+
+type StorefrontCategoryRecord = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageAlt: string | null;
+  media: { url: string } | null;
+};
 
 @Injectable()
 export class CategoryService {
@@ -42,6 +52,12 @@ export class CategoryService {
     return category;
   }
 
+  async findStorefront() {
+    const categories = await this.categoryRepository.findStorefront();
+
+    return categories.map((category) => this.toStorefrontCategory(category));
+  }
+
   async findBySlug(slug: string) {
     const category = await this.categoryRepository.findBySlug(slug);
     if (!category) {
@@ -77,5 +93,19 @@ export class CategoryService {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
     return this.categoryRepository.delete(id);
+  }
+
+  private toStorefrontCategory(
+    category: StorefrontCategoryRecord,
+  ): StorefrontCategoryItem {
+    return {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      image: category.media
+        ? { url: category.media.url, altText: category.imageAlt }
+        : null,
+    };
   }
 }

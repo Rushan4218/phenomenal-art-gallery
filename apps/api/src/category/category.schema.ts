@@ -32,3 +32,11 @@ export const listCategoriesSchema = paginationQuerySchema;
 export type CreateCategoryType = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryType = z.infer<typeof updateCategorySchema>;
 export type ListCategoriesType = z.infer<typeof listCategoriesSchema>;
+
+export type StorefrontCategoryItem = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  image: { url: string; altText: string | null } | null;
+};

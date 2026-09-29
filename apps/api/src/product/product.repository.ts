@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service.js';
+import { ProductStatus } from '../generated/prisma/enums.js';
 import {
   ProductCreateInput,
   ProductUpdateInput,
   ProductWhereInput,
 } from '../generated/prisma/models.js';
-import { ListProductsType, ProductImageType } from './product.schema.js';
+import {
+  ListProductsType,
+  ListStorefrontProductsType,
+  ProductImageType,
+} from './product.schema.js';
 
 @Injectable()
 export class ProductRepository {
@@ -54,6 +59,57 @@ export class ProductRepository {
         images: { include: { media: true } },
         category: true,
         productTags: { include: { tag: true } },
+      },
+    });
+  }
+
+  async findStorefront(query: ListStorefrontProductsType) {
+    const { page, limit, q, category } = query;
+    const where: ProductWhereInput = {
+      status: ProductStatus.ACTIVE,
+      ...(q ? { name: { contains: q, mode: 'insensitive' as const } } : {}),
+      ...(category ? { category: { slug: category } } : {}),
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          price: true,
+          category: { select: { name: true, slug: true } },
+          images: {
+            orderBy: { sortOrder: 'asc' },
+            take: 1,
+            select: { altText: true, media: { select: { url: true } } },
+          },
+        },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return { data, total };
+  }
+
+  async findStorefrontBySlug(slug: string) {
+    return this.prisma.product.findFirst({
+      where: { slug, status: ProductStatus.ACTIVE },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        price: true,
+        category: { select: { name: true, slug: true } },
+        images: {
+          orderBy: { sortOrder: 'asc' },
+          select: { altText: true, media: { select: { url: true } } },
+        },
       },
     });
   }

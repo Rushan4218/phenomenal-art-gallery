@@ -40,6 +40,20 @@ export class CategoryRepository {
     });
   }
 
+  async findStorefront() {
+    return this.prisma.category.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        imageAlt: true,
+        media: { select: { url: true } },
+      },
+    });
+  }
+
   async findBySlug(slug: string) {
     return this.prisma.category.findUnique({
       where: { slug },

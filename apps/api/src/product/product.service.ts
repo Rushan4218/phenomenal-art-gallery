@@ -4,9 +4,22 @@ import { CategoryService } from '../category/category.service.js';
 import {
   CreateProductType,
   ListProductsType,
+  ListStorefrontProductsType,
   ProductImageType,
+  StorefrontProductDetail,
+  StorefrontProductListItem,
   UpdateProductType,
 } from './product.schema.js';
+
+type StorefrontProductRecord = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: { toString(): string };
+  category: { name: string; slug: string };
+  images: { altText: string; media: { url: string } }[];
+};
 
 @Injectable()
 export class ProductService {
@@ -60,6 +73,29 @@ export class ProductService {
     return product;
   }
 
+  async findStorefront(query: ListStorefrontProductsType) {
+    const { data, total } = await this.productRepository.findStorefront(query);
+
+    return {
+      data: data.map((product) => this.toStorefrontListItem(product)),
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
+    };
+  }
+
+  async findStorefrontBySlug(slug: string) {
+    const product = await this.productRepository.findStorefrontBySlug(slug);
+    if (!product) {
+      throw new NotFoundException(`Product with slug ${slug} not found`);
+    }
+
+    return this.toStorefrontProductDetail(product);
+  }
+
   async findBySlug(slug: string) {
     const product = await this.productRepository.findBySlug(slug);
     if (!product) {
@@ -97,6 +133,44 @@ export class ProductService {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
     return this.productRepository.delete(id);
+  }
+
+  private toStorefrontListItem(
+    product: Omit<StorefrontProductRecord, 'description'>,
+  ): StorefrontProductListItem {
+    const image = product.images[0];
+
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price.toString(),
+      category: {
+        name: product.category.name,
+        slug: product.category.slug,
+      },
+      image: image ? { url: image.media.url, altText: image.altText } : null,
+    };
+  }
+
+  private toStorefrontProductDetail(
+    product: StorefrontProductRecord,
+  ): StorefrontProductDetail {
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      price: product.price.toString(),
+      category: {
+        name: product.category.name,
+        slug: product.category.slug,
+      },
+      images: product.images.map((image) => ({
+        url: image.media.url,
+        altText: image.altText,
+      })),
+    };
   }
 
   private withDefaultSortOrder(images: ProductImageType[]) {

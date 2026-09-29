@@ -33,7 +33,39 @@ export const listProductsSchema = paginationQuerySchema.extend({
   status: z.enum(ProductStatus).optional(),
 });
 
+export const listStorefrontProductsSchema = paginationQuerySchema.extend({
+  q: z.string().trim().min(1).max(100).optional(),
+  category: z.string().trim().min(1).max(100).optional(),
+});
+
 export type CreateProductType = z.infer<typeof createProductSchema>;
 export type UpdateProductType = z.infer<typeof updateProductSchema>;
 export type ProductImageType = z.infer<typeof productImageSchema>;
 export type ListProductsType = z.infer<typeof listProductsSchema>;
+export type ListStorefrontProductsType = z.infer<
+  typeof listStorefrontProductsSchema
+>;
+
+export type StorefrontProductImage = {
+  url: string;
+  altText: string;
+};
+
+export type StorefrontProductListItem = {
+  id: string;
+  name: string;
+  slug: string;
+  price: string;
+  category: { name: string; slug: string };
+  image: StorefrontProductImage | null;
+};
+
+export type StorefrontProductDetail = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: string;
+  category: { name: string; slug: string };
+  images: StorefrontProductImage[];
+};
