@@ -6,3 +6,6 @@ allowBuilds:
   '@scarf/scarf': true
   prisma: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@nestjs/authentication@0.0.1'
+  - '@nestjs/mail@0.0.1'
