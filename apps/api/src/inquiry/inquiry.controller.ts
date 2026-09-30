@@ -9,7 +9,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { InquiryService } from './inquiry.service.js';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   createInquirySchema,
   listInquiriesSchema,
@@ -20,6 +26,7 @@ import {
 } from './inquiry.schema.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 
+@ApiTags('Inquiries')
 @Controller('inquiries')
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
