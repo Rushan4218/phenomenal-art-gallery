@@ -15,6 +15,7 @@ import {
   SmtpTransport,
 } from '@nestjs/mail';
 import { join } from 'node:path';
+import { CartModule } from './cart/cart.module.js';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { join } from 'node:path';
     CategoryModule,
     ProductModule,
     InquiryModule,
+    CartModule
   ],
   controllers: [AppController],
   providers: [AppService],

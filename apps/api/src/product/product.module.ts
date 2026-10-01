@@ -9,5 +9,6 @@ import { CategoryModule } from '../category/category.module.js';
   imports: [CategoryModule],
   controllers: [ProductController, ProductStorefrontController],
   providers: [ProductService, ProductRepository],
+  exports: [ProductService],
 })
 export class ProductModule {}
