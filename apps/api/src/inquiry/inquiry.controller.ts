@@ -86,7 +86,7 @@ export class InquiryController {
     const { data, meta } = await this.inquiryService.findMany(query);
     return {
       message: 'Inquiries retrieved successfully',
-      data,
+      inquiries: data,
       meta,
     };
   }

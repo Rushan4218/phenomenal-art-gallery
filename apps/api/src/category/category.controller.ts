@@ -83,7 +83,7 @@ export class CategoryController {
     const { data, meta } = await this.categoryService.findMany(query);
     return {
       message: 'Categories retrieved successfully',
-      data,
+      categories: data,
       meta,
     };
   }

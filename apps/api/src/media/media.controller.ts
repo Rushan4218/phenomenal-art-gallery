@@ -77,8 +77,9 @@ export class MediaController {
       properties: {
         keys: {
           type: 'array',
-          items: { type: 'string' },
-          example: ['products/1.jpg', 'categories/2.jpg'],
+          items: { type: 'string', format: 'uuid' },
+          description: 'IDs of the media records to delete',
+          example: ['123e4567-e89b-12d3-a456-426614174000'],
         },
       },
       required: ['keys'],

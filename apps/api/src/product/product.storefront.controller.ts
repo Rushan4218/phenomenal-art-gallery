@@ -44,10 +44,11 @@ export class ProductStorefrontController {
     @Query(new ZodValidationPipe(listStorefrontProductsSchema))
     query: ListStorefrontProductsType,
   ) {
-    const { data, meta } = await this.productService.findStorefront(query);
+    const { data, meta } =
+      await this.productService.findManyForStorefront(query);
     return {
       message: 'Products retrieved successfully',
-      data,
+      products: data,
       meta,
     };
   }
@@ -61,10 +62,10 @@ export class ProductStorefrontController {
   })
   @Get(':slug')
   async findBySlug(@Param('slug') slug: string) {
-    const data = await this.productService.findStorefrontBySlug(slug);
+    const product = await this.productService.findBySlugForStorefront(slug);
     return {
       message: 'Product retrieved successfully',
-      data,
+      product,
     };
   }
 }

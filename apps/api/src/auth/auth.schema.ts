@@ -14,3 +14,18 @@ export const signInSchema = z.object({
   password: z.string(),
 });
 export type SignInType = z.infer<typeof signInSchema>;
+
+export const verifyEmailSchema = z.object({
+  token: z.string().trim().min(1),
+});
+export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;
+
+// The user shape the auth API may expose: profile fields only, never the
+// password hash or internal timestamps.
+export type AuthUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  emailVerified: boolean;
+};

@@ -76,8 +76,9 @@ export class ProductService {
     return product;
   }
 
-  async findStorefront(query: ListStorefrontProductsType) {
-    const { data, total } = await this.productRepository.findStorefront(query);
+  async findManyForStorefront(query: ListStorefrontProductsType) {
+    const { data, total } =
+      await this.productRepository.findManyForStorefront(query);
 
     return {
       data: data.map((product) => this.toStorefrontListItem(product)),
@@ -90,8 +91,8 @@ export class ProductService {
     };
   }
 
-  async findStorefrontBySlug(slug: string) {
-    const product = await this.productRepository.findStorefrontBySlug(slug);
+  async findBySlugForStorefront(slug: string) {
+    const product = await this.productRepository.findBySlugForStorefront(slug);
     if (!product) {
       throw new NotFoundException(`Product with slug ${slug} not found`);
     }

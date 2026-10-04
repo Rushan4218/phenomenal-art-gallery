@@ -10,10 +10,10 @@ export class CategoryStorefrontController {
   @ApiOperation({ summary: 'Browse all categories' })
   @Get()
   async findMany() {
-    const data = await this.categoryService.findStorefront();
+    const categories = await this.categoryService.findAllForStorefront();
     return {
       message: 'Categories retrieved successfully',
-      data,
+      categories,
     };
   }
 }

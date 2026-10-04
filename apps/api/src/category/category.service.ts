@@ -55,8 +55,8 @@ export class CategoryService {
     return category;
   }
 
-  async findStorefront() {
-    const categories = await this.categoryRepository.findStorefront();
+  async findAllForStorefront() {
+    const categories = await this.categoryRepository.findAllForStorefront();
 
     return categories.map((category) => this.toStorefrontCategory(category));
   }

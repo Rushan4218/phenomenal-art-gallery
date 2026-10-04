@@ -3,9 +3,19 @@ import { InquiryRepository } from './inquiry.repository.js';
 import {
   CreateInquiryType,
   ListInquiriesType,
+  StorefrontInquiry,
   UpdateInquiryType,
 } from './inquiry.schema.js';
 import { InquiryStatus } from '../generated/prisma/enums.js';
+
+// Exact shape of the repository's create select; mirrored here so the mapper
+// below fails to compile if that query changes.
+type StorefrontInquiryRecord = {
+  id: string;
+  subject: string;
+  status: InquiryStatus;
+  createdAt: Date;
+};
 
 @Injectable()
 export class InquiryService {
@@ -58,6 +68,18 @@ export class InquiryService {
   }
 
   async createInquiry(data: CreateInquiryType) {
-    return this.inquiryRepository.create(data);
+    const inquiry = await this.inquiryRepository.create(data);
+    return this.toStorefrontInquiry(inquiry);
+  }
+
+  private toStorefrontInquiry(
+    inquiry: StorefrontInquiryRecord,
+  ): StorefrontInquiry {
+    return {
+      id: inquiry.id,
+      subject: inquiry.subject,
+      status: inquiry.status,
+      createdAt: inquiry.createdAt,
+    };
   }
 }

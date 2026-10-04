@@ -6,6 +6,23 @@ import {
 import { ProductStatus } from '../generated/prisma/enums.js';
 import { ProductService } from '../product/product.service.js';
 import { CartRepository } from './cart.repository.js';
+import { type StorefrontCart, type StorefrontCartItem } from './cart.schema.js';
+
+// The exact shape the repository's cart selects return. Mirrors
+// CartRepository so these mappers fail to compile if the query changes.
+type StorefrontCartItemRecord = {
+  productId: string;
+  quantity: number;
+  product: {
+    name: string;
+    slug: string;
+    price: { toString(): string };
+  };
+};
+
+type StorefrontCartRecord = {
+  items: StorefrontCartItemRecord[];
+};
 
 @Injectable()
 export class CartService {
@@ -17,13 +34,12 @@ export class CartService {
   async getCart(userId: string) {
     const cart = await this.cartRepository.findByUserId(userId);
 
+    // The empty response keeps the same shape as a stored cart.
     if (!cart) {
-      return {
-        items: [],
-      };
+      return { items: [] };
     }
 
-    return cart;
+    return this.toStorefrontCart(cart);
   }
 
   async addItem(userId: string, productId: string, quantity: number) {
@@ -38,14 +54,20 @@ export class CartService {
     const existingItem = await this.cartRepository.findItem(cart.id, productId);
 
     if (existingItem) {
-      return this.cartRepository.updateItemQuantity(
+      const updated = await this.cartRepository.updateItemQuantity(
         cart.id,
         productId,
         existingItem.quantity + quantity,
       );
+      return this.toStorefrontCartItem(updated);
     }
 
-    return this.cartRepository.addItem(cart.id, productId, quantity);
+    const added = await this.cartRepository.addItem(
+      cart.id,
+      productId,
+      quantity,
+    );
+    return this.toStorefrontCartItem(added);
   }
 
   async updateItem(userId: string, productId: string, quantity: number) {
@@ -65,7 +87,12 @@ export class CartService {
       throw new NotFoundException('Cart item not found');
     }
 
-    return this.cartRepository.updateItemQuantity(cart.id, productId, quantity);
+    const updated = await this.cartRepository.updateItemQuantity(
+      cart.id,
+      productId,
+      quantity,
+    );
+    return this.toStorefrontCartItem(updated);
   }
 
   async removeItem(userId: string, productId: string) {
@@ -116,5 +143,27 @@ export class CartService {
     if (quantity < 1) {
       throw new BadRequestException('Quantity must be at least 1');
     }
+  }
+
+  private toStorefrontCart(cart: StorefrontCartRecord): StorefrontCart {
+    return {
+      items: cart.items.map((item) => this.toStorefrontCartItem(item)),
+    };
+  }
+
+  // Every field the customer needs to review the line, picked explicitly so
+  // nothing internal (timestamps, raw product rows) can slip into a response.
+  private toStorefrontCartItem(
+    item: StorefrontCartItemRecord,
+  ): StorefrontCartItem {
+    return {
+      productId: item.productId,
+      quantity: item.quantity,
+      product: {
+        name: item.product.name,
+        slug: item.product.slug,
+        price: item.product.price.toString(),
+      },
+    };
   }
 }

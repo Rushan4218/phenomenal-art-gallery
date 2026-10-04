@@ -16,6 +16,8 @@ import {
 } from '@nestjs/mail';
 import { join } from 'node:path';
 import { CartModule } from './cart/cart.module.js';
+import { OrderModule } from './order/order.module.js';
+import { HealthModule } from './health/health.module.js';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { CartModule } from './cart/cart.module.js';
         templates: new FileTemplateEngine({
           dir: join(import.meta.dirname, 'mail/templates'),
         }),
-        from: 'Accounts <accounts@example.com>',
+        from: process.env.MAIL_FROM ?? 'Accounts <accounts@example.com>',
       }),
     }),
     AuthenticationModule.forRootAsync({
@@ -45,7 +47,9 @@ import { CartModule } from './cart/cart.module.js';
     CategoryModule,
     ProductModule,
     InquiryModule,
-    CartModule
+    CartModule,
+    OrderModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

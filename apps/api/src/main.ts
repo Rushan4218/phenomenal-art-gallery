@@ -5,6 +5,19 @@ import 'dotenv/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Cookie-based auth sends session cookies cross-origin, so CORS must allow
+  // credentials. Allowed origin(s) come from CORS_ORIGIN (comma-separated);
+  // when unset, the request origin is reflected so local dev keeps working.
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+      : true,
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Phenomenal Art Gallery API')
     .setDescription(

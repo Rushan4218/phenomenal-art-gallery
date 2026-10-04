@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service.js';
 import { PasswordHasher } from '@nestjs/authentication';
-import { type SignUpType, type SignInType } from './auth.schema.js';
-import { User } from '../generated/prisma/client.js';
+import {
+  type AuthUser,
+  type SignUpType,
+  type SignInType,
+} from './auth.schema.js';
 
 @Injectable()
 export class CredentialService {
@@ -11,8 +14,18 @@ export class CredentialService {
     private readonly passwordHasher: PasswordHasher,
   ) {}
 
-  async register(data: SignUpType): Promise<User> {
-    return this.userService.createUser(data);
+  async register(data: SignUpType): Promise<AuthUser> {
+    const user = await this.userService.createUser(data);
+
+    // Pick the exposed fields explicitly: the raw row also carries
+    // passwordHash and timestamps, which must never reach the HTTP layer.
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      emailVerified: user.emailVerified,
+    };
   }
 
   async verify(data: SignInType) {

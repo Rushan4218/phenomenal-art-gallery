@@ -117,7 +117,7 @@ export class ProductController {
     const { data, meta } = await this.productService.findMany(query);
     return {
       message: 'Products retrieved successfully',
-      data,
+      products: data,
       meta,
     };
   }

@@ -40,7 +40,7 @@ export class CategoryRepository {
     });
   }
 
-  async findStorefront() {
+  async findAllForStorefront() {
     return this.prisma.category.findMany({
       orderBy: { createdAt: 'desc' },
       select: {
