@@ -18,6 +18,7 @@ import { join } from 'node:path';
 import { CartModule } from './cart/cart.module.js';
 import { OrderModule } from './order/order.module.js';
 import { HealthModule } from './health/health.module.js';
+import { PaymentModule } from './payment/payment.module.js';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { HealthModule } from './health/health.module.js';
         emailVerification: { url: `${process.env.APP_URL}/verify-email` },
       }),
     }),
+    HealthModule,
     AuthModule,
     DatabaseModule,
     MediaModule,
@@ -49,7 +51,7 @@ import { HealthModule } from './health/health.module.js';
     InquiryModule,
     CartModule,
     OrderModule,
-    HealthModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

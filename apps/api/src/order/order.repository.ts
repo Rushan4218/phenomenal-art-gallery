@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service.js';
 import { OrderCreateInput } from '../generated/prisma/models.js';
-import { OrderStatus } from '../generated/prisma/enums.js';
+import {
+  OrderStatus,
+  PaymentProvider,
+  PaymentStatus,
+} from '../generated/prisma/enums.js';
 
 @Injectable()
 export class OrderRepository {
@@ -114,6 +118,15 @@ export class OrderRepository {
               product: { select: { slug: true } },
             },
           },
+        },
+      });
+      // create payment for the order
+      await tx.payment.create({
+        data: {
+          order: { connect: { id: order.id } },
+          status: PaymentStatus.PENDING,
+          provider: PaymentProvider.COD,
+          amount: order.totalAmount,
         },
       });
 

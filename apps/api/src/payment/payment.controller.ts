@@ -1,0 +1,26 @@
+import { Controller, Param, ParseUUIDPipe, Patch } from '@nestjs/common';
+import { PaymentService } from './payment.service.js';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Payments')
+@Controller('payments')
+export class PaymentController {
+  constructor(private readonly paymentService: PaymentService) {}
+
+  @ApiOperation({ summary: 'Mark a payment as paid' })
+  @ApiParam({
+    name: 'id',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'The ID of the payment',
+    required: true,
+  })
+  @Patch(':id/paid')
+  async markAsPaid(@Param('id', ParseUUIDPipe) id: string) {
+    const payment = await this.paymentService.markAsPaid(id);
+
+    return {
+      message: 'Payment marked as paid successfully',
+      payment,
+    };
+  }
+}
