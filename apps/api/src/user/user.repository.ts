@@ -5,6 +5,7 @@ import { Prisma } from '../generated/prisma/client.js';
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
+
   async create(data: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data,
