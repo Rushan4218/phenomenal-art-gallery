@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PaymentRepository } from './payment.repository.js';
-import { PaymentStatus } from '../generated/prisma/enums.js';
+import { OrderStatus, PaymentStatus } from '../generated/prisma/enums.js';
 
 @Injectable()
 export class PaymentService {
@@ -22,6 +22,11 @@ export class PaymentService {
     const payment = await this.paymentRepository.findById(id);
     if (!payment) {
       throw new NotFoundException(`Payment with ID ${id} not found`);
+    }
+    if (payment.order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException(
+        `Payment cannot be marked as paid for a cancelled order`,
+      );
     }
     if (payment.status !== PaymentStatus.PENDING) {
       throw new BadRequestException(

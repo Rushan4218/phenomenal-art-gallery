@@ -15,6 +15,7 @@ export class OrderRepository {
     return this.prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
+        payment: true,
         orderItems: {
           include: {
             product: true,
@@ -28,6 +29,7 @@ export class OrderRepository {
     return this.prisma.order.findUnique({
       where: { id },
       include: {
+        payment: true,
         orderItems: {
           include: {
             product: true,

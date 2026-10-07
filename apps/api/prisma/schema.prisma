@@ -227,7 +227,7 @@ model Order {
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
-  payments   Payment[]
+  payment    Payment?
 
   @@index([userId])
 }

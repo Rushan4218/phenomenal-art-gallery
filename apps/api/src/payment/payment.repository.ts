@@ -10,6 +10,7 @@ export class PaymentRepository {
   findById(id: string) {
     return this.prisma.payment.findUnique({
       where: { id },
+      include: { order: true },
     });
   }
 
