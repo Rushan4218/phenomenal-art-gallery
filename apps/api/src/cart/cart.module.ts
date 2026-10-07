@@ -8,5 +8,6 @@ import { ProductModule } from '../product/product.module.js';
   imports: [ProductModule],
   controllers: [CartController],
   providers: [CartService, CartRepository],
+  exports: [CartService],
 })
 export class CartModule {}

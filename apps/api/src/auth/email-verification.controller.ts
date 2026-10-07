@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { type User } from '../generated/prisma/client.js';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
+import { verifyEmailSchema, type VerifyEmailType } from './auth.schema.js';
 
 @ApiTags('Auth')
 @Controller('auth/email')
@@ -35,12 +37,18 @@ export class EmailVerificationController {
     },
   })
   @Post('verify')
-  async verify(@Body('token') token: string) {
-    const verified = await this.emailVerificationService.verify(token);
+  async verify(
+    @Body(new ZodValidationPipe(verifyEmailSchema)) data: VerifyEmailType,
+  ) {
+    const verified = await this.emailVerificationService.verify(data.token);
     if (!verified) {
       throw new BadRequestException('Invalid or expired token');
     }
-    return { email: verified.email, emailVerified: true };
+    return {
+      message: 'Email verified successfully',
+      email: verified.email,
+      emailVerified: true,
+    };
   }
 
   @ApiOperation({ summary: 'Resend the email verification message' })
@@ -50,5 +58,6 @@ export class EmailVerificationController {
       throw new ConflictException('Email is already verified');
     }
     await this.emailVerificationService.send(user);
+    return { message: 'Verification email sent successfully' };
   }
 }

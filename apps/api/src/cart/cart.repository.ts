@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service.js';
+import { ProductStatus } from '../generated/prisma/enums.js';
 
 @Injectable()
 export class CartRepository {
@@ -8,10 +9,21 @@ export class CartRepository {
   findByUserId(userId: string) {
     return this.prisma.cart.findUnique({
       where: { userId },
-      include: {
+      // Only the cart id (callers attach items with it) and the storefront
+      // item projection are fetched; inactive products are hidden from the
+      // cart instead of failing it, and full product rows are never loaded.
+      select: {
+        id: true,
         items: {
-          include: {
-            product: true,
+          where: {
+            product: {
+              status: ProductStatus.ACTIVE,
+            },
+          },
+          select: {
+            productId: true,
+            quantity: true,
+            product: { select: { name: true, slug: true, price: true } },
           },
         },
       },
@@ -45,9 +57,9 @@ export class CartRepository {
         quantity,
       },
       select: {
-        id: true,
         productId: true,
         quantity: true,
+        product: { select: { name: true, slug: true, price: true } },
       },
     });
   }
@@ -62,6 +74,11 @@ export class CartRepository {
       },
       data: {
         quantity,
+      },
+      select: {
+        productId: true,
+        quantity: true,
+        product: { select: { name: true, slug: true, price: true } },
       },
     });
   }

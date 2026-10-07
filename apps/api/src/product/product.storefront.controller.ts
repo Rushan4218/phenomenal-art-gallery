@@ -6,6 +6,7 @@ import {
   type ListStorefrontProductsType,
 } from './product.schema.js';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Public } from '@nestjs/authentication';
 
 @ApiTags('Storefront Products')
 @Controller('products')
@@ -39,15 +40,17 @@ export class ProductStorefrontController {
     example: 'thangka-paintings',
     description: 'Filter active products by category slug',
   })
+  @Public()
   @Get()
   async findMany(
     @Query(new ZodValidationPipe(listStorefrontProductsSchema))
     query: ListStorefrontProductsType,
   ) {
-    const { data, meta } = await this.productService.findStorefront(query);
+    const { data, meta } =
+      await this.productService.findManyForStorefront(query);
     return {
       message: 'Products retrieved successfully',
-      data,
+      products: data,
       meta,
     };
   }
@@ -59,12 +62,13 @@ export class ProductStorefrontController {
     description: 'The slug of the active product',
     required: true,
   })
+  @Public()
   @Get(':slug')
   async findBySlug(@Param('slug') slug: string) {
-    const data = await this.productService.findStorefrontBySlug(slug);
+    const product = await this.productService.findBySlugForStorefront(slug);
     return {
       message: 'Product retrieved successfully',
-      data,
+      product,
     };
   }
 }

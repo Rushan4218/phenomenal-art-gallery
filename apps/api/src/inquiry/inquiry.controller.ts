@@ -5,10 +5,11 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InquiryService } from './inquiry.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import {
   ApiBody,
   ApiOperation,
@@ -17,51 +18,18 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
-  createInquirySchema,
   listInquiriesSchema,
   updateInquirySchema,
   type UpdateInquiryType,
-  type CreateInquiryType,
   type ListInquiriesType,
 } from './inquiry.schema.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 
 @ApiTags('Inquiries')
+@UseGuards(AdminGuard)
 @Controller('inquiries')
 export class InquiryController {
   constructor(private readonly inquiryService: InquiryService) {}
-
-  @ApiOperation({ summary: 'Create a new inquiry' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: 'John Doe' },
-        email: {
-          type: 'string',
-          format: 'email',
-          example: 'john.doe@example.com',
-        },
-        phone: { type: 'string', example: '+1234567890' },
-        subject: { type: 'string', example: 'Product Inquiry' },
-        message: {
-          type: 'string',
-          example: 'I would like to know more about your products.',
-        },
-      },
-      required: ['name', 'email', 'subject', 'message'],
-    },
-  })
-  @Post()
-  async createInquiry(
-    @Body(new ZodValidationPipe(createInquirySchema)) data: CreateInquiryType,
-  ) {
-    const inquiry = await this.inquiryService.createInquiry(data);
-    return {
-      message: 'Inquiry created successfully',
-      inquiry,
-    };
-  }
 
   @ApiOperation({ summary: 'Get all inquiries' })
   @ApiQuery({
@@ -86,7 +54,7 @@ export class InquiryController {
     const { data, meta } = await this.inquiryService.findMany(query);
     return {
       message: 'Inquiries retrieved successfully',
-      data,
+      inquiries: data,
       meta,
     };
   }

@@ -39,14 +39,6 @@ export class UserService {
     return user;
   }
 
-  async findByEmail(email: string) {
-    const user = await this.userRepository.findByEmail(this.normalize(email));
-    if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
-    }
-    return user;
-  }
-
   async findCredentials(email: string) {
     const user = await this.userRepository.findCredentials(
       this.normalize(email),
@@ -72,17 +64,6 @@ export class UserService {
       id,
       this.normalize(email),
     ));
-  }
-
-  async updateEmail(id: string, email: string) {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    if (await this.userRepository.findByEmail(email)) {
-      throw new ConflictException('Email is already registered');
-    }
-    return this.userRepository.updateEmail(id, this.normalize(email));
   }
 
   private normalize(email: string): string {

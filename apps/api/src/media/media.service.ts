@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryStorageAdapter } from './storage/cloudinary.storage.js';
-import { MediaRepository } from './media.respository.js';
+import { MediaRepository } from './media.repository.js';
 import { StorageProvider } from '../generated/prisma/enums.js';
 
 @Injectable()

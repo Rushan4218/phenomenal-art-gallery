@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import {
   createProductSchema,
@@ -28,6 +30,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Products')
+@UseGuards(AdminGuard)
 @Controller('admin/products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -117,7 +120,7 @@ export class ProductController {
     const { data, meta } = await this.productService.findMany(query);
     return {
       message: 'Products retrieved successfully',
-      data,
+      products: data,
       meta,
     };
   }

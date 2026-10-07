@@ -10,6 +10,14 @@ export class InquiryRepository {
   create(data: Prisma.InquiryCreateInput) {
     return this.prisma.inquiry.create({
       data,
+      // Inquiries are only ever created for the public form, so fetch the
+      // confirmation fields and nothing admin-managed.
+      select: {
+        id: true,
+        subject: true,
+        status: true,
+        createdAt: true,
+      },
     });
   }
 

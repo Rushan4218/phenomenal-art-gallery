@@ -50,7 +50,7 @@ export class CartController {
       data.productId,
       data.quantity,
     );
-    return { message: 'Cart Item added successfully', item };
+    return { message: 'Cart item added successfully', item };
   }
 
   @ApiOperation({ summary: 'Get the current cart' })
@@ -87,7 +87,7 @@ export class CartController {
       productId,
       data.quantity,
     );
-    return { message: 'Cart Item updated successfully', item };
+    return { message: 'Cart item updated successfully', item };
   }
 
   @ApiOperation({ summary: 'Remove an item from the cart' })
@@ -103,7 +103,7 @@ export class CartController {
     @Param('productId', ParseUUIDPipe) productId: string,
   ) {
     await this.cartService.removeItem(user.id, productId);
-    return { message: 'Cart Item removed successfully' };
+    return { message: 'Cart item removed successfully' };
   }
 
   @ApiOperation({ summary: 'Clear the cart' })

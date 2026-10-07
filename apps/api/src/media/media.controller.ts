@@ -5,11 +5,13 @@ import {
   Delete,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaService } from './media.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import {
   deleteMediaSchema,
   uploadMediaSchema,
@@ -20,6 +22,7 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { mediaFolders } from './media.constant.js';
 
 @ApiTags('Media')
+@UseGuards(AdminGuard)
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
@@ -77,8 +80,9 @@ export class MediaController {
       properties: {
         keys: {
           type: 'array',
-          items: { type: 'string' },
-          example: ['products/1.jpg', 'categories/2.jpg'],
+          items: { type: 'string', format: 'uuid' },
+          description: 'IDs of the media records to delete',
+          example: ['123e4567-e89b-12d3-a456-426614174000'],
         },
       },
       required: ['keys'],

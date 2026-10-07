@@ -63,7 +63,7 @@ export class ProductRepository {
     });
   }
 
-  async findStorefront(query: ListStorefrontProductsType) {
+  async findManyForStorefront(query: ListStorefrontProductsType) {
     const { page, limit, q, category } = query;
     const where: ProductWhereInput = {
       status: ProductStatus.ACTIVE,
@@ -96,7 +96,7 @@ export class ProductRepository {
     return { data, total };
   }
 
-  async findStorefrontBySlug(slug: string) {
+  async findBySlugForStorefront(slug: string) {
     return this.prisma.product.findFirst({
       where: { slug, status: ProductStatus.ACTIVE },
       select: {
