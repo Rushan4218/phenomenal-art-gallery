@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { CurrentUser, Public } from '@nestjs/authentication';
+import { CurrentUser } from '@nestjs/authentication';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import { type User } from '../generated/prisma/client.js';
 import { createOrderSchema, type CreateOrderType } from './order.schema.js';
