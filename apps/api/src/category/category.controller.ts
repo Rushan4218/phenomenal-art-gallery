@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import {
   createCategorySchema,
@@ -28,6 +30,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Categories')
+@UseGuards(AdminGuard)
 @Controller('admin/categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

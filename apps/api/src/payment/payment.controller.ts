@@ -1,8 +1,16 @@
-import { Controller, Param, ParseUUIDPipe, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Payments')
+@UseGuards(AdminGuard)
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}

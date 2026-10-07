@@ -5,8 +5,10 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service.js';
+import { AdminGuard } from '../common/guards/admin.guard.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
 import {
   updateOrderStatusSchema,
@@ -15,6 +17,7 @@ import {
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Orders')
+@UseGuards(AdminGuard)
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
